@@ -1,0 +1,20 @@
+/* 
+    Document   : style
+    Created on : Jul 30, 2013, 10:02:18 PM
+    Author     : jasdeep
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+@import url(http://fonts.googleapis.com/css?family=Courgette);
+
+.logo-font {
+    font-family: 'Courgette', cursive;
+}
+
+.center-text{
+    text-align: center;
+    top: 30%;
+    position: absolute;
+    width: 100%;
+}
