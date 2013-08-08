@@ -8,6 +8,13 @@ var data_ky_name = null;
 var typingTimer;
 var doneTypingInterval = 2500;
 
+$( "div[data-role='page']" ).one("pageinit",function() {
+    $( "#errorPopup" ).popup({ positionTo: "window" });
+    $( "#errorPopup" ).find("#errorRefresh").click(function(){
+        refreshPage();
+    });
+});
+
 $( document ).one( "pageshow", "#home_loading_page", function() {
     html_ky_list = $( '#ky_search' );
     fetch_keertaneeye(true);
@@ -22,7 +29,7 @@ $( document ).one( "pageshow", "#ky_list_page", function() {
     }
 });
 
-$( document ).one( "pageshow", "#keertan_mp3_list_page", function() {
+$( document ).on( "pageshow", "#keertan_mp3_list_page", function() {
     html_mp3_list = $( '#mp3_list' );
     if(data_ky_name === null){
         var selectedKy = $.cookie('selected_ky_name'); 
@@ -53,6 +60,17 @@ function goto_keertan_mp3_page(custom_trans) {
     } else { 
         $.mobile.changePage("#keertan_mp3_list_page", {transition : "slide"});
     }
+}
+function refreshPage() {
+  $.mobile.changePage(
+    window.location.href,
+    {
+      allowSamePageTransition : true,
+      transition              : 'none',
+      showLoadMsg             : false,
+      reloadPage              : true
+    }
+  );
 }
 
 //internal array search setup(to improve performance)
@@ -103,6 +121,7 @@ function updateKyList(kySearch){
 
 //mp3 page setup functions
 function setupMP3Links() {
+    showLoading();
     var mp3ListLength = data_mp3_list.length;
     html_mp3_list.html('<li data-role="list-divider">'+data_ky_name+' <span class="ui-li-count">'+mp3ListLength+'</span></li>');
     
@@ -113,6 +132,7 @@ function setupMP3Links() {
     }
     html_mp3_list.listview( "refresh" );
     html_mp3_list.trigger( "updatelayout");
+    hideLoading();
 }
 
 function addToMP3List(link,place,year){
@@ -131,13 +151,18 @@ function fetch_keertaneeye(isHomePage) {
                     where url="http://akj.org/skins/one/search.php" and \n\
                     xpath=\'//select[contains(@name,"keertaneeya")]/option\' ';
     $.queryYQL(statement, function (data) {
-        data_ky_list = data.query.results.option;
-        console.log(data_ky_list);
-        hideLoading();
-        if(isHomePage) {
-            goto_ky_list_page();
+        if(data.query.results) {
+            data_ky_list = data.query.results.option;
+            console.log(data_ky_list);
+            hideLoading();
+            if(isHomePage) {
+                goto_ky_list_page();
+            } else {
+                setupKySearch();
+            }
         } else {
-            setupKySearch();
+            hideLoading();
+            $( "#errorPopup" ).popup( "open" );
         }
     });
 } 
@@ -151,18 +176,23 @@ function fetch_mp3_links(ky_name,isKyListPage) {
                     xpath="//img[contains(@alt,\'MP3\')]/../..//a//@href"';
     console.log(statement);
     $.queryYQL(statement, "all", function (data) {
-        var allLinks = data.query.results.postresult;
-        data_mp3_list = allLinks.split("\n");
-        console.log(data_mp3_list);
-        hideLoading();
-        
-        if(isKyListPage) {
-            //manage cookies
-            $.removeCookie('selected_ky_name');
-            $.cookie('selected_ky_name', ky_name);
-            goto_keertan_mp3_page();
+        if(data.query.results.postresult) {
+            var allLinks = data.query.results.postresult;
+            data_mp3_list = allLinks.split("\n");
+            console.log(data_mp3_list);
+            hideLoading();
+
+            if(isKyListPage) {
+                //manage cookies
+                $.removeCookie('selected_ky_name');
+                $.cookie('selected_ky_name', ky_name);
+                goto_keertan_mp3_page();
+            } else {
+                setupMP3Links();
+            }
         } else {
-            setupMP3Links();
+            hideLoading();
+            $( "#errorPopup" ).popup( "open" );
         }
     });
 }

@@ -13,7 +13,7 @@
 </head>
 <body>
     <!-- Start of second page -->
-    <div data-role="page" class="logo-page" id="home_loading_page">
+    <div data-role="page" id="home_loading_page">
             <div data-role="content">
                 <h1 class="logo-font ui-bar-a center-text">Prime Keertan</h1>
             </div><!-- /content -->
@@ -40,6 +40,14 @@
                     <ul id="mp3_list" data-role="listview" ></ul>
             </div><!-- /content -->
     </div>
+    
+    <div data-role="popup" id="errorPopup" data-overlay-theme="a" data-dismissible="false" data-transition="fade" class="ui-corner-all">
+        <div style="padding:10px 20px;">
+            <h3 class="ui-title">Cannot access AKJ.ORG</h3>
+            <p>Please refresh or try again later..</p>
+        </div>
+    </div>
+    
     <!-- /page -->
     <script src="js/jquery.query-yql.min.js"></script>
     <script src="js/index.js"></script>
