@@ -97,7 +97,7 @@ function timedUpdateKyList(kySearch){
 function updateKyList(kySearch){
     showLoading();
     var localKyList = jQuery.extend(true, {}, data_ky_list);
-    
+    kySearch = kySearch.toLowerCase();
     var html = "";
     for (var ky_index in localKyList) {
         var currKy = localKyList[ky_index];
